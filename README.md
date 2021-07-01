@@ -1,4 +1,4 @@
-This is a fork of the agentscript framework, that aims to create a simulation environment that allows a coding tournament for competing strategies in the simulation.
+This is a fork of the agentscript framework, that aims to create a simulation environment. The goal is to hold a coding tournament for competing strategies in the simulation.
 
 To run the project a web server is required (for example XAMPP).
 
