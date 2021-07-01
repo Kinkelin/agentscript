@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <title>veggieWorld</title>
+        <link rel="icon" type="image/x-icon" href="../favicon.ico" />
+    </head>
+    <body>
+        <script type="module">
+            import * as util from '../src/utils.js'
+            import TwoDraw from '../src/TwoDraw.js'
+            import Animator from '../src/Animator.js'
+            import Color from '../src/Color.js'
+            import Model from './VeggieWorldModel.js'
+			import dat from 'https://cdn.skypack.dev/dat.gui'
+			import Shapes from '../src/Shapes.js'
+
+			const shapes = new Shapes()
+			
+			async function addImages() {
+                await shapes.imagePathPromise('bush', './bush.png');
+				await shapes.imagePathPromise('tree', './tree.png');
+				await shapes.imagePathPromise('sequoia', './sequoia.png');
+				await shapes.imagePathPromise('cactus', './cactus.png');
+				await shapes.imagePathPromise('fern', './fern.png');
+				await shapes.imagePathPromise('grass', './grass.png');
+				await shapes.imagePathPromise('fruit', './fruit.png');
+            }
+
+            await addImages()
+
+            const terrainColors = {
+                plains: Color.rgbaToPixel(152, 218, 96),
+                jungle: Color.rgbaToPixel(0, 114, 48),
+                mountain: Color.rgbaToPixel(111, 111, 111),
+                desert: Color.rgbaToPixel(234, 221, 140)
+            }
+            const drawOptions = {
+                patchesColor: p => terrainColors[p.type],
+				turtlesShape: t => {
+				return (t.breed.name == 'agent') ? 'dart' : t.breed.name},
+				turtlesSize: t => {
+				switch (t.breed.name) {
+					case 'agent':
+						return 3;
+					case 'sequoia':
+						return 2;
+					default:
+						return 1;
+				}},
+            }
+
+            const model = new Model()
+            await model.startup()
+            model.setup()
+
+            const view = new TwoDraw(
+                model,
+                { div: 'modelDiv', patchSize: 8 },
+                drawOptions
+            )
+
+            const anim = new Animator(
+                () => {
+                    model.step()
+                    view.draw()
+                },
+                100, // run 500 steps
+                2 // 30 fps
+            )
+
+			const gui = new dat.GUI()
+            gui.add(anim, 'fps', 1, 60, 1).onChange(() => anim.reset())
+            gui.add(anim, 'toggle')
+            gui.add(anim, 'once')
+            gui.add(view, 'width', 100, 1000, 25)
+            gui.add(view.drawOptions, 'turtlesSize', 1, 10, 1)
+            // ==============================
+
+            util.toWindow({ util, model, view, anim })
+        </script>
+        <div id="modelDiv"></div>
+    </body>
+</html>
